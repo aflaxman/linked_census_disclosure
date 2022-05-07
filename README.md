@@ -1,25 +1,23 @@
-# jpc-style
+# Simulation study of disclosure risk in demonstration DHC data from
+  April 2022
 
-This is the LaTeX style for the Journal of Privacy and Confidentiality. Submission instructions are available at https://journalprivacyconfidentiality.org/index.php/jpc/about/submissions. 
+Plan of Work:
 
-## Source
-The style is derived from LMCS style at https://lmcs.episciences.org/page/authors-latex-style .
+For each block, reconstruct age/sex/race structure for people under age 18:
 
-## On Overleaf
+1. In SF1 (call this ReMF)
 
-This can be found on Overleaf: https://v2.overleaf.com/read/jcvxjtfqvgyz
+2. In DHC (I don't have a catchy name for this yet)
 
-## Implementing
+Simulate linking ReMF with a corresponding block in 2020 under 4 scenarios:
 
-## For final Layout
+1. No privacy --- link on PIC (unique person identification codes)
+2. No DAS --- link on age, race, block
+3. Swapping only --- link on age, race, block
+4. Swapping in 2010, TDA in 2020 --- link on age, race, block
 
-Add the following lines after the `\documentclass` lines:
+Hypothesis:
 
-```
-% JPC Layouting Macros
-% THESE ARE ADDED BY THE EDITORIAL TEAM - NO NEED TO SET HERE
-\newcommand{\doisuffix}{v0.i0.999}
-% \jpcheading{vol}{issue}{year}{notused}{subm}{publ}{rev}{spec_iss}{title}
-\jpcheading{0}{0}{2000}{}{Mar.~20, 2017}{Jun.~22, 2018}{}{Special issue}
-```
+1 will have a lot of links, 2 will have many less but still a lot, 3
+will have 5-10% less than 2, and 4 will have none.
 
