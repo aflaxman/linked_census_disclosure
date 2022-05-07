@@ -4,3 +4,5 @@
 *.out
 *.synctex.gz
 *~
+*__pycache__*
+*.egg-info*
