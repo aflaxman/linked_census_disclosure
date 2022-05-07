@@ -1,0 +1,151 @@
+\documentclass{jpc} %%% last changed 2014-08-20
+
+% JPC Layouting Macros
+% THESE ARE ADDED BY THE EDITORIAL TEAM - NO NEED TO SET HERE
+%\newcommand{\doisuffix}{v0.i0.999}
+% \jpcheading{vol}{issue}{year}{notused}{subm}{publ}{rev}{spec_iss}{title}
+%\jpcheading{0}{0}{2000}{}{Mar.~20, 2017}{Jun.~22, 2018}{}{Special issue}
+%%% last changed 2014-08-20
+
+%% mandatory lists of keywords
+\keywords{census, disclosure avoidance, linkage attack}
+
+%% read in additional TeX-packages or personal macros here:
+%% e.g. \usepackage{tikz}
+%\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage[ruled]{algorithm2e}
+%%\input{myMacros.tex}
+%% define non-standard environments BEYOND the ones already supplied
+%% here, for example
+\theoremstyle{plain}\newtheorem{satz}[thm]{Satz} %\crefname{satz}{Satz}{S\"atze}
+%% Do NOT replace the proclamation environments lready provided by
+%% your own.
+
+\def\eg{{\em e.g.}}
+\def\cf{{\em cf.}}
+
+%% due to the dependence on amsart.cls, \begin{document} has to occur
+%% BEFORE the title and author information:
+
+\begin{document}
+
+\title[Risk of linked census data to transgender families]{The risk of linked census data to transgender families: a simulation study}
+%\titlecomment{{\lsuper*}OPTIONAL comment concerning the title, \eg,
+%  if a variant or an extended abstract of the paper has appeared elsewhere.}
+
+\author[A.~Flaxman]{Abraham D. Flaxman}	%required
+\address{Institute for Health Metrics and Evaluation, University of Washington}	%required
+\email{abie@uw.edu}  %optional
+%\thanks{thanks 1, optional.}	%optional
+
+\author[O. Keyes]{Os Keyes}	%optional
+%\address{address2; addresses should initially be duplicated, even if
+%  authors share an affiliation}	%optional
+%\email{name2@email2; ditto for email addresses}  %optional
+%\thanks{thanks 2, optional.}	%optional
+
+%\author[C.~Name3]{Carla Name3}	%optional
+%\address{address 3}	%optional
+%\urladdr{name3@url3\quad\rm{(optionally, a web-page can be specified)}}  %optional
+%\thanks{thanks 3, optional.}	%optional
+
+%% etc.
+
+%% required for running head on odd and even pages, use suitable
+%% abbreviations in case of long titles and many authors:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% the abstract has to PRECEDE the command \maketitle:
+%% be sure not to issue the \maketitle command twice!
+
+\begin{abstract}
+  \noindent Every ten years the United States Census Bureau (USCB) collects data on all people living in the US, including information on age, sex, race, ethnicity, and household relationship.
+  USCB is required by law to protect this data from disclosure where data provided by any individual can be identified, and, in 2020, USCB used a novel approach to meet this requirement, the differentially private TopDown Algorithm.
+  
+  We conducted a simulation study to investigate the risk of disclosing a change in how an individual's sex was recorded in successive censuses.  In a simulated population based on a reconstruction of the 2010 decennial census of Texas, we compared the number of transgender individuals identified by linking simulated census data from 2010 and 2020 under alternative approaches to disclosure avoidance, including swapping in 2020 (as used in the 2010) and TDA in 2020 (as planned for the actual release).
+  
+  We found that without any disclosure avoidance in 2010 or 2020, a linkage attack identified XX transgender children.  With X\% swapping in 2010 and 2020, linkage identified XX, a YY\% decrease.  With swapping in 2010 and TDA in 2020, linkage identified XX, a YY\% decrease from no disclosure avoidance, and a ZZ\% decrease from swapping.
+  
+  In light of the recent Texas law outlawing parents from obtaining medical care for their trans children, our results demonstrate the importance of disclosure avoidance for census data, and suggest that the TDA approach planned by USCB [[is/is not]] sufficient for protecting against this particular risk.
+\end{abstract}
+
+\maketitle
+
+%% start the paper here:
+\section*{Introduction}\label{S:one}
+
+[[Census Bureau does decennial census, and is required to avoid disclosure.  So does does DAS, has recently changed DAS to DP.]]
+
+[[This open the DAS process to scrutiny, allowing policy choice balancing privacy and accuracy.]]
+
+[[Past investigations have focused primarily on the impact of DAS on accuracy of key census-derived statistics [refs].]]
+
+[[In this note, we use simulation to investigate a risk to privacy, by focusing on the risk of a sensitivy disclosure, that of a child's transgender status. Definition of transgender, reminder to readers in the distant future what Texas and other states are doing right now.]]
+
+
+\section*{Methods}
+
+[[Description of simulation: reconstruction exercise to obtain individual-level data on age, sex, race/ethnicity, and household structure similar to the 2010 decennial census for all individuals in state of Texas in 2010.]]
+
+[[To simulate how this population might change over the next decade, we focused on household migration, and posited that every household might move (making it harder to link) with a probability derived empirically from the number of households which have not moved in at least ten years from the 2020 ACS PUMS (5-year sample). We used a simple model of migration, where all households moved within Texas, to a random census block chosen with probability proportional to size.]]
+
+[[We also simulated individuals reporting different values for sex in the 2010 and 2020 census independently with empirically derived probability based on BRFSS and/or Census Pulse surveys, which measures gender identity among the 18+ population. Common approach in trans-epidemiology, refs from Os.  We posited that nearly all of the transgender youth had sex reported based on gender assigned at birth in the 2010 census, and extrapolated the prevalence of transgender identities that would lead to differing responses to the census sex by assuming a linear increase from age 8 to age 18.]]
+
+[[We considered four different levels of disclosure avoidance: (1) extreme disclosure where names were published, allowing even households that moved to be linked between censuses; (2) no DAS, where names were not published, but there was no effort to swap or otherwise perturb the data; (3) swap DAS, where 3\% of households were exchanged with another household with the same total population and voting age population; and (4) TDA DAS, where the differentially private approach was used to protect against disclosure.]]
+
+\section*{Results}
+
+[[Perhaps something about the 2010 data we reconstructed, e.g. how many people we started with, how many children age 0-7 who might be linked. Something about average household size or average number and age of children in households by race/ethnicity.]]
+
+[[Info on the migration findings, how many households with kids were unmoved ten years later when the census came around again.  Maybe some breakdown by race/ethnicity, and age or household structure?  I'm sure income is a big part of staying in the same place for 10 years, but that is not in the decennial census, and I don't want to do all the work to add it to the synthetic version.]]
+
+[[Result one: how many transkids there are according to this model, and how many of them would by identified by someone with full access to the private decennial census data that includes names and addresses.  It will be about 50,000 to 100,000.]]
+
+[[Result two: Not all of them are likely to be identified based on published census data alone, however.  Only 10-20 thousand are still in the same house in 2020 as in 2010, for example, and some fraction of those who are in the same house live in a census block where they are not identified uniquely by their age (and race/ethnicity, if you try to link on that, too).  But without any DAS, I expect there will be about 10,000 kids for whom a respectful parent would record a different sex in the 2020 census than the 2010 census.]]
+
+[[Result three: most of those identified without DAS would still be identified after swapping.  Swapping is basically a special case of moving households, after all.]]
+
+[[Result four (the one that I'm not sure how to achieve algorithmically): TDA means basically no one is identified, even though epsilon is high.  It would be really cool to do this with a range of epsilons, but I'm not sure I'll even be able to do it with the one that Census Bureau has provided demonstration data for...]]
+
+\section{Discussion}
+
+[[We hope that this convinces some readers of the importance of disclosure avoidance for the 2020 census.]]
+
+[[Not just kids, also transgender adults for whom sex was recorded differently in 2010 and 2020 census.]]
+
+[[Limitations: many. Differential mobility and household dynamics.]]
+
+\section*{Acknowledgment}
+  \noindent The authors wish to acknowledge fruitful discussions with
+  A and B.
+
+%% in general the use of bibtex is encouraged
+
+\bibliography{sample}
+\bibliographystyle{abbrvnat}
+
+\appendix
+\section{}
+  Here is a check-list to be completed before submitting the paper to
+  JPC:
+\begin{itemize}[label=$\triangleright$]
+\item your submission uses the latest version of jpc.cls
+\item the text of your submission is contained in a single file,
+  except for macros and graphics
+\item your graphics use only one format
+\item you have loaded the hyperref package
+\item you have \emph{not} loaded the times package
+\item you have not routinely adjusted vertical spacing manually by issuing
+  \texttt{\textbackslash vspace} or \texttt{\textbackslash vskip} commands
+\item you have used the command \texttt{\textbackslash sloppy} only
+  locally and in emergency cases
+\item your abstract only contains as few math-expressions as possible and no
+  references
+\end{itemize}
+
+  This listing also shows how to override the default bullet $\bullet$
+  of the \texttt{itemize}-envronment by a different symbol, in this
+  case \texttt{\textbackslash triangleright}.
+\end{document}
