@@ -46,21 +46,11 @@ def reconstruct_block(table_dict, state, county, tract, block):
     assert len(t) == 1
     s_p11 = t.iloc[0]
 
-    # P14 is SEX BY AGE FOR THE POPULATION UNDER 20 YEARS [43]
-    t = table_dict['P14'].query(geo_query_str)
-    assert len(t) == 1
-    s_p14 = t.iloc[0]
-
-    # P14 is SEX BY AGE FOR THE POPULATION UNDER 20 YEARS [43]
-    t = table_dict['P14'].query(geo_query_str)
-    assert len(t) == 1
-    s_p14 = t.iloc[0]
-
-    # P12A is SEX BY AGE FOR SELECTED AGE CATEGORIES (WHITE ALONE) [49]
-    # it has age groups that need to be decoded in a somewhat complex way
-    # and there are many other variants of race and ethnicity
     p12_iterations = [
         dict(table='P12', race=range(63), ethnicity=[0,1]),
+        # P12A is SEX BY AGE FOR SELECTED AGE CATEGORIES (WHITE ALONE) [49]
+        # it has age groups that need to be decoded in a somewhat complex way
+        # and there are many other variants of race and ethnicity
         dict(table='P12A', race=[0], ethnicity=[0,1]), # race 0 = white
         dict(table='P12B', # SEX BY AGE FOR SELECTED AGE CATEGORIES (BLACK OR AFRICAN AMERICAN ALONE) [49]
              race=[1], ethnicity=[0,1]), # race 1 = black
@@ -100,6 +90,11 @@ def reconstruct_block(table_dict, state, county, tract, block):
             assert len(t) == 1
             p12['s'] = t.iloc[0]
 
+    # P14 is SEX BY AGE FOR THE POPULATION UNDER 20 YEARS [43]
+    t = table_dict['P14'].query(geo_query_str)
+    assert len(t) == 1
+    s_p14 = t.iloc[0]
+
 
     ### now form the integer program
 
@@ -119,14 +114,20 @@ def reconstruct_block(table_dict, state, county, tract, block):
         )  # HACK: would be more elegant to use P1 for the overall count
 
 
-    P8_rows = [ 3, 4, 5, 6, 7, 8, # race alone for white, black, aian, asian, nhpi, sor
-                11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, # bi-racial
-            ]
-    P8_rows += [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 21, 62]  # four races
-    P8_rows += [64, 65, 66, 67, 68, 69]  # five races
-    P8_rows += [71] # six races
+    P8_rows = [ 3, 4, 5, 6, 7, 8,] # race alone for white, black, aian, asian, nhpi, sor
+    P8_rows += [ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, # bi-racial
+             ]
+    P8_rows += list(range(27, 47))  # three races    
+    #P8_rows += [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 21, 62]  # four races
+    #P8_rows += [64, 65, 66, 67, 68, 69]  # five races
+    #P8_rows += [71] # six races
+    #assert len(P8_rows) == 63
+
     model.p8_race  = ConstraintList()
     for race_code, data_ref in enumerate(P8_rows):
+        #if race_code in [53, 54, ]:
+            #print(race_code, s_p8[f'P8{data_ref:04d}'])
+            #continue
         model.p8_race.add(
             sum(model.x[a,s,race_code,e,] for a in range(n_ages) for s in range(n_sexes) for e in range(n_eths)
             ) == s_p8[f'P8{data_ref:04d}']
@@ -144,12 +145,12 @@ def reconstruct_block(table_dict, state, county, tract, block):
 
 
     # again for P10, now all for the 18+ age count
-    model.p10 = ConstraintList()
-    for race_code, data_ref in enumerate(P8_rows):
-        model.p10.add(
-                sum(model.x[18,s,race_code,e] for s in range(n_sexes) for e in range(n_eths)
-                    ) == s_p10[f'P10{data_ref:04d}']
-            )
+    #model.p10 = ConstraintList()
+    #for race_code, data_ref in enumerate(P8_rows):
+    #    model.p10.add(
+    #            sum(model.x[18,s,race_code,e] for s in range(n_sexes) for e in range(n_eths)
+    #                ) == s_p10[f'P10{data_ref:04d}']
+    #        )
 
 
     # again for P11, now all for the 18+ age count
@@ -217,7 +218,6 @@ def reconstruct_block(table_dict, state, county, tract, block):
     results = opt.solve(model)  # solve the model with the selected solver
 
     results = []
-
     for a in range(n_ages):
         for s in range(n_sexes):
             for r in range(n_races):
@@ -228,3 +228,7 @@ def reconstruct_block(table_dict, state, county, tract, block):
     df_results = pd.DataFrame(results)
 
     return df_results
+    try:
+        pass
+    except ValueError:
+        return None # failed to find a solution
