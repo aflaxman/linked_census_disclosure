@@ -1,7 +1,20 @@
+#!/homes/abie/.conda/envs/pyomo_env/bin/python
+#SBATCH -t 24:00:00
+#SBATCH --mem=64G
+#SBATCH -c 1
+#SBATCH -A proj_simscience
+#SBATCH -p all.q
+#SBATCH -o /share/scratch/users/abie/projects/2022/remf_april_dhc/output.txt
+
 import sys
+
+file_path = '/share/scratch/users/abie/projects/2022/remf_april_dhc'
 
 n_splits = int(sys.argv[1])
 i_split = int(sys.argv[2])
+
+print('running 00_generate_remf.py with', n_splits, 'splits.')
+print('processing part', i_split, flush=True)
 
 import numpy as np, pandas as pd
 import linked_census_disclosure.data as lcd_data
@@ -25,12 +38,14 @@ for i, location_tuple in enumerate(rows[i_split::n_splits]):
         print('.', end=' ', flush=True)
     results_dhc[location_tuple] = lcd_model.reconstruct_block(dhc_tables, *location_tuple)
 
-pd.concat(results_dhc).to_csv(f'remf/dhc_{n_splits}_{i_split}.csv.gz')
+pd.concat(results_dhc).to_csv(f'{file_path}/dhc_{n_splits}_{i_split}.csv.gz')
 
 results_sf1 = {}
+
+
 for i, location_tuple in enumerate(rows[i_split::n_splits]):
     if i % 60 == 0:
         print('.', end=' ', flush=True)
     results_sf1[location_tuple] = lcd_model.reconstruct_block(sf1_tables, *location_tuple)
 
-pd.concat(results_sf1).to_csv(f'remf/sf1_{n_splits}_{i_split}.csv.gz')
+pd.concat(results_sf1).to_csv(f'{file_path}/sf1_{n_splits}_{i_split}.csv.gz')

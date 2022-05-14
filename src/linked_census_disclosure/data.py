@@ -40,7 +40,7 @@ def load_sf1_tables(state_abbr, state):
                          encoding='latin1'
                      )
 
-    df_segments = pd.read_csv('https://www.dropbox.com/s/8z2uqlydeml5xv5/table_segments_2010_sf1.csv?dl=1')
+    df_segments = pd.read_csv(f'{file_path}/table_segments_2010_sf1.csv')
     def load_sf1_segment(seg : int):
         """Load a 'segment' of SF1 data
 
