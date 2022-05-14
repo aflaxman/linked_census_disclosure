@@ -1,5 +1,7 @@
 """ Methods for data ETL for linked census disclosure experiment"""
 
+import glob
+
 import numpy as np
 import pandas as pd
 
@@ -179,3 +181,30 @@ def load_dhc_tables(state_abbr, state):
 
     return table_dict
 
+
+def read_synth_data(state_abbr : str) -> pd.DataFrame:
+    """ load pd.DataFrame of synthetic population for given state
+
+    Parameters
+    ----------
+    state_abbr : str, two-letters, e.g. 'mn'
+    """
+    fname_list = synth_fnames(state_abbr)
+
+    df_list = []
+    for i, fname in enumerate(fname_list):
+        df = pd.read_csv(fname)
+        df_list.append(df)
+    df_synth = pd.concat(df_list, ignore_index=True)
+
+    return df_synth
+
+def synth_fnames(state_abbr : str) -> list:
+    """ get list of fnames for synthetic population for given state/county
+
+    Parameters
+    ----------
+    state_abbr : str, two-letters, e.g. 'mn'
+    """
+    fname_list = glob.glob(f'/ihme/scratch/users/beatrixh/synthetic_pop/pyomo/best/{state_abbr.lower()}/*.csv')
+    return fname_list
