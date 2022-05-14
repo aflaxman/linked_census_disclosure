@@ -66,9 +66,9 @@
   
   We conducted a simulation study to investigate the risk of disclosing a change in how an individual's sex was recorded in successive censuses.  In a simulated population based on a reconstruction of the 2010 decennial census of Texas, we compared the number of transgender individuals identified by linking simulated census data from 2010 and 2020 under alternative approaches to disclosure avoidance, including swapping in 2020 (as used in the 2010) and TDA in 2020 (as planned for the actual release).
   
-  We found that without any disclosure avoidance in 2010 or 2020, a linkage attack identified XX transgender children.  With X\% swapping in 2010 and 2020, linkage identified XX, a YY\% decrease.  With swapping in 2010 and TDA in 2020, linkage identified XX, a YY\% decrease from no disclosure avoidance, and a ZZ\% decrease from swapping.
+  We found that without any disclosure avoidance in 2010 or 2020, a reconstruction-abetted linkage attack identified XX transgender children.  With X\% swapping in 2010 and 2020, it identified XX, a YY\% decrease.  With swapping in 2010 and TDA in 2020, it identified XX, a YY\% decrease from no disclosure avoidance, and a ZZ\% decrease from swapping.
   
-  In light of the recent Texas law outlawing parents from obtaining medical care for their trans children, our results demonstrate the importance of disclosure avoidance for census data, and suggest that the TDA approach planned by USCB [[is/is not]] sufficient for protecting against this particular risk.
+  In light of recent laws prohibiting parents from obtaining medical care for their trans children, our results demonstrate the importance of disclosure avoidance for census data, and suggest that the TDA approach planned by USCB [[is/is not]] sufficient for protecting against this particular risk.
 \end{abstract}
 
 \maketitle
@@ -76,14 +76,18 @@
 %% start the paper here:
 \section*{Introduction}\label{S:one}
 
-[[Census Bureau does decennial census, and is required to avoid disclosure.  So does does DAS, has recently changed DAS to DP.]]
+As part of the 2020 decennial census, the US Census Bureau has developed a new approach to disclosure avoidance, based on differential privacy, called the TopDown Algorithm (TDA) (\cite{abowd2019census}).  The details of their approach have been refined iteratively since they first debuted as part of the 2018 end-to-end test (\cite{garfinkel2019end}).  The release of the Demographics and Housing Characteristics (DHC) data in August, 2023 will be the next application of TDA for a data product from the 2020 decennial census. At this time of writing (May 2022) we have the products of the first application of TDA (the Public Law 94-171 redistricting data released in August, 2021) as well as a demonstration DHC product from a test run in March 2022 (\cite{census2022demonstration}) to help us understand plans and tradeoffs for some of the TDA options previously enumerated  (\cite{petti2019differential}), such as at what level the overall privacy budget will be set.
 
-[[This open the DAS process to scrutiny, allowing policy choice balancing privacy and accuracy.]]
+In support of their work to develop and validate TDA,  the Census Bureau has previously released a series of Privacy-Protected Microdata Files (PPMFs) by applying iterations of TDA to the 2010 Census Edited File.  The DHC product from March 2022 diverges from this pattern and provides summary tables without releasing a corresponding PPMF.  This invites the question of whether the release of a PPMF or reconstruction of microdata from DHC tables might compromise privacy.  In math and computer science, the greek symbol $\epsilon$ typically denotes a small positive number (for example, this is a math joke: ``Let $\epsilon$ be negative!'').  While there is no rigid guidance as to what magnitude of $\epsilon$ is appropriate in applications of $\epsilon$-differentially private (DP) algorithms, it is possible that the $\epsilon$ selected by Census Bureau will be too high. In this work, we investigated empirically how well TDA protects against disclosure of sensitive information on an individual's gender identity in DHC data.
 
-[[Past investigations have focused primarily on the impact of DAS on accuracy of key census-derived statistics [refs].]]
 
-[[In this note, we use simulation to investigate a risk to privacy, by focusing on the risk of a sensitivy disclosure, that of a child's transgender status. Definition of transgender, reminder to readers in the distant future what Texas and other states are doing right now.]]
+Past investigations of demonstration products have focused primarily on the impact of TDA on accuracy of key census-derived statistics,
+%[[refs go here one day]]
+and we agree that there are broad, political implications behind statistical accuracy; the framing of census data informs everything from the shape and number of legislative districts to funding and resourcing for minority groups (see, for example, \cite{thompson2012making}). But this is also true of privacy---accurate representation is not an unalloyed good. For many groups, particularly those who are vulnerable to and have experienced active discrimination by state entities, higher accuracy can also mean higher identifiability and higher \textit{scrutiny}. An example of this is undocumented immigrants' relation to questions about citizenship---questions that can be used to identify, surveil, and punish undocumented people, and consequently lead to reduced engagement with and trust of the census (see \cite{barreto2019}). More recent in the public eye (although just as longstanding, as highlighted by \cite{canaday2009straight}) are questions of gender (\cite{singer2015profusion}), on which this investigation is focused.
 
+The last few years have seen heightened scrutiny of transgender people (henceforth ``trans''), with a particular focus on (and moral panic around) trans children (see \cite{slothouber2020trans}). This has included actions by state actors to simultaneously legislate against access to care and equal treatment, and use existing mechanisms of government to punish the children and parents who have become identifiable. Most prominently, the governor of Texas, in \cite{abbottletter}, has directed the state Department of Family and Protective Services to investigate the parents of any trans child who receives gender-affirming medical care. In order to do so, he advocates drawing on existing systems for child and parent surveillance, including abuse reporting requirements, to identify targets.
+
+As all of this suggests, there are many reasons for us to be cautious around data availability and the pursuit of accuracy as an untrammelled good. While it is beneficial from a statistical perspective, an absence of privacy simultaneously risks both producing real, material harms for the individuals identified, and undermining trust in the census itself and so (paradoxically) reducing the very accuracy that is aimed for. To demonstrate the importance of factoring identifiability into account---and the necessity of a stronger emphasis on disclosure avoidance in census policy---we used simulation to investigate a risk to privacy, by focusing on the risk of disclosing a child's transgender status, through discordant reporting of binary gender in successive censuses.
 
 \section*{Methods}
 
@@ -109,13 +113,14 @@
 
 [[Result four (the one that I'm not sure how to achieve algorithmically): TDA means basically no one is identified, even though epsilon is high.  It would be really cool to do this with a range of epsilons, but I'm not sure I'll even be able to do it with the one that Census Bureau has provided demonstration data for...]]
 
+[[Os note on the above: what does "it might be possible if we had more demonstration data" mean for the politics of the privacy/disclosure debate?]]
+
 \section{Discussion}
 
 [[We hope that this convinces some readers of the importance of disclosure avoidance for the 2020 census.]]
 
-[[Not just kids, also transgender adults for whom sex was recorded differently in 2010 and 2020 census.]]
+Although the focus of this piece is on trans \textit{children}---specifically,those under-18 in both the 2010 and 2020 census, with different sex records in each---it is worth emphasising that they are not the only people at risk. With the addition of more census tranches (say, 2000, or, going forward, 2030), the range of identifiable people would expand to include trans adults, many of whom, if they have children, are also being targeted for additional scrutiny by state bodies. We should also emphasise several limitations to this note. First, the limited range of sex options on the census means that many trans people whose identities fall outside a simplistic binary do not alter their census markers. Second, we would expect differences in the amount of geographic mobility and consistency in household structure for trans families writ large, with one response to increasing scrutiny, at least for those with means, being to purposefully move states. These limitations suggest this is in fact the \textit{minimal} count of trans people identifiable through the current census approach to data disclosure, and that without changes to the data disclosure approach, well-intentioned efforts to increase the ability of Census Bureau instruments to record and represent trans people (see \cite{whfactsheet}) will only increase the risk of identifiability and harm.
 
-[[Limitations: many. Differential mobility and household dynamics.]]
 
 \section*{Acknowledgment}
   \noindent The authors wish to acknowledge fruitful discussions with
@@ -123,7 +128,7 @@
 
 %% in general the use of bibtex is encouraged
 
-\bibliography{sample}
+\bibliography{note_entries}
 \bibliographystyle{abbrvnat}
 
 \appendix
