@@ -228,7 +228,3 @@ def reconstruct_block(table_dict, state, county, tract, block):
     df_results = pd.DataFrame(results)
 
     return df_results
-    try:
-        pass
-    except ValueError:
-        return None # failed to find a solution

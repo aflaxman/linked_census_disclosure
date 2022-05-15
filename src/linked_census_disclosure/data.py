@@ -187,24 +187,47 @@ def read_synth_data(state_abbr : str) -> pd.DataFrame:
 
     Parameters
     ----------
-    state_abbr : str, two-letters, e.g. 'mn'
-    """
-    fname_list = synth_fnames(state_abbr)
+    state_abbr : str, two-letters, e.g. 'tx'
 
-    df_list = []
-    for i, fname in enumerate(fname_list):
-        df = pd.read_csv(fname)
-        df_list.append(df)
-    df_synth = pd.concat(df_list, ignore_index=True)
+    Note: not all state work currently
+    """
+    df_synth = pd.read_csv(f'/share/scratch/users/abie/projects/2021/das_files/{state_abbr}_synth.csv')
+
+    # some parts of the simulation will be easier if each household id was unique
+    # to accomplish this, I will merge in the geoid
+
+    df_synth['hh_id'] = df_synth.geoid.astype(str) + '-' + df_synth.hh_id.astype(int).astype(str)
 
     return df_synth
 
-def synth_fnames(state_abbr : str) -> list:
-    """ get list of fnames for synthetic population for given state/county
 
-    Parameters
-    ----------
-    state_abbr : str, two-letters, e.g. 'mn'
-    """
-    fname_list = glob.glob(f'/ihme/scratch/users/beatrixh/synthetic_pop/pyomo/best/{state_abbr.lower()}/*.csv')
-    return fname_list
+def read_dhc_remf(state_abbr):
+    assert state_abbr == 'tx'
+
+    file_path = '/share/scratch/users/abie/projects/2022/remf_april_dhc/'
+
+    dhc = []
+    for fname in glob.glob(f'{file_path}/dhc*.csv.gz'):
+        df = pd.read_csv(fname)
+        dhc.append(df)
+    dhc = pd.concat(dhc)
+
+    column_names = ['state', 'county', 'tract', 'block', 'row_num', 'age', 'sex', 'race', 'eth', 'n']
+    dhc.columns = column_names
+    return dhc
+
+
+def read_sf1_remf(state_abbr):
+    assert state_abbr == 'tx'
+
+    file_path = '/share/scratch/users/abie/projects/2022/remf_april_dhc/'
+
+    sf1 = []
+    for fname in glob.glob(f'{file_path}/sf1*.csv.gz'):
+        df = pd.read_csv(fname)
+        sf1.append(df)
+    sf1 = pd.concat(sf1)
+
+    column_names = ['state', 'county', 'tract', 'block', 'row_num', 'age', 'sex', 'race', 'eth', 'n']
+    sf1.columns = column_names
+    return sf1
