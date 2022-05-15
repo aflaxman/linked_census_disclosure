@@ -31,6 +31,11 @@ t = dhc_tables['P1'].set_index(
 )
 rows = t[t>0].index
 
+t = sf1_tables['P1'].set_index(
+    ['STATE', 'COUNTY', 'TRACT', 'BLOCK']).P10001.sort_values(
+    ascending=False
+)
+rows = rows.append(t[t>0].index).drop_duplicates()
 
 results_dhc = {}
 for i, location_tuple in enumerate(rows[i_split::n_splits]):
