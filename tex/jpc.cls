@@ -219,9 +219,9 @@
 %% Defines the pagestyle for the title page.
 %% Usage: \jpcheading{vol}{issue}{year}{notused}{subm}{publ}{rev}{spec_iss}{title}
 
-\def\jpcurl{www.journalprivacyconfidentiality.org}
-\def\doiprefix{10.29012/jpc}
-\def\doisuffix{v0.i0.000}
+%\def\jpcurl{www.journalprivacyconfidentiality.org}
+%\def\doiprefix{10.29012/jpc}
+%\def\doisuffix{v0.i0.000}
 \def\crossrefurl{https://doi.org/}
 \def\cclicenseurl{https://creativecommons.org/licenses/by-nc-nd/4.0/}
 \def\cclicense{Creative Commons (CC BY-NC-ND 4.0)}
@@ -254,14 +254,17 @@
 \hbox{%
   \vbox{\fontsize{6}{8 pt}\baselineskip=6 pt\vss
     \hbox{\hbox to 20 pt{\hfill}
-          \textsf{JOURNAL OF PRIVACY}\hfil}
+          \textsf{%JOURNAL OF PRIVACY
+          }\hfil}
     \hbox{\hbox to 20 pt{\phantom{x}}
-          \textsf{AND CONFIDENTIALITY}}}}
+          \textsf{%AND CONFIDENTIALITY
+          }}}}
 \hfill
 \hbox{\fontencoding{T1}%
   \vbox{\fontsize{6}{8 pt}\baselineskip=6 pt\vss
     \hbox{\textsf{\href{https://\jpcurl}{\jpcurl}}\hfil}
-    \hbox{\textsf{DOI:\href{\crossrefurl\doiprefix .\doisuffix}{\doiprefix .\doisuffix}}\hfil}
+    \hbox{\textsf{%DOI:
+    \href{\crossrefurl\doiprefix .\doisuffix}{\doiprefix .\doisuffix}}\hfil}
 }}\hfill
 \hbox{%
   \vbox{\fontsize{6}{8 pt}\baselineskip=6 pt\vss
