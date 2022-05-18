@@ -67,7 +67,7 @@
   
   We conducted a simulation study to investigate the risk of disclosing a change in how an individual's sex was recorded in successive censuses.  In a simulated population based on a reconstruction of the 2010 decennial census of Texas, we compared the number of transgender individuals under 18 identified by linking simulated census data from 2010 and 2020 under alternative approaches to disclosure avoidance, including swapping in 2020 (as used in the 2010) and TDA in 2020 (as planned for the actual release).
   
-  We found that without any disclosure avoidance in 2010 or 2020, a reconstruction-abetted linkage attack identified over 500 transgender children.  With 5\% swapping in 2010 and 2020, it identified 461 individuals, a 12\% decrease.  With swapping in 2010 and TopDown in 2020, it identified 61 individuals, an 88\% decrease from swapping.
+  Our simulation assumed that in Texas 0.2\% of the 3,095,857 children who were under the age of 8 in the 2010 census would have a different sex reported in the 2020 census, and 23\% would reside at the same address, which implied that 1,424 trans youth were at risk of having their gender identity disclosed by a reconstruction-abetted linkage attack. We found that without any disclosure avoidance in 2010 or 2020, a reconstruction-abetted linkage attack identified over 500 transgender children.  With 5\% swapping in 2010 and 2020, it identified 461 individuals, a 12\% decrease.  With swapping in 2010 and TopDown in 2020, it identified 61 individuals, an 88\% decrease from swapping.
   
   In light of recent laws prohibiting parents from obtaining medical care for their trans children, our results demonstrate the importance of disclosure avoidance for census data, and suggest that the TopDown approach planned by Census Bureau is a substantial improvement compared to the previous approach, but still risks disclosing sensitive information.
 \end{abstract}
@@ -126,8 +126,9 @@ To complete this approach, we identified all simulants who had a unique combinat
 
 Our synthetic population included 25,145,561 individual simulants, matching exactly the 2010 population count for Texas.  We focused on the simulants aged zero to seven on April 1, 2010, of which we had 3,095,857.
 %%% Could add something about average household size or average number and age of children in households by race/ethnicity.
-Among these simulants, 0.53\% were trans, with 0.18\% trans boys, 0.23\% trans girls, and 0.12\% gender nonconforming.
-Over the ten years simulation the majority of households moved at least once, and only 23\% of simulants resided in the same census block in 2010 and 2020.
+Among these simulants, 0.53\% were trans, with 0.18\% trans boys, 0.23\% trans girls, and 0.12\% gender nonconforming, which led to 0.2\% of the simulants having a different value reported for sex in the 2010 and 2020 censuses.
+Over the ten years of simulation, the majority of households moved at least once and only 23\% of simulants resided in the same census block in 2010 and 2020.
+Taking these together implied that in our simulation there were $(3,095,857 \text{ kids}) \times (0.2\%) \times (23\%) = 1,424$ trans youth who were at risk of having their gender identity disclosed by a reconstruction-abetted linkage attack.
 
 We found that in our scenario with extreme disclosure, where individual-level data with linkable names was published (Scenario 1), linking between 2010 and 2020 census data to identify individuals with discordantly reported values for sex would identify over 6,000 trans kids, accounting for 38\% of all trans kids in our simulated version of Texas.
 
