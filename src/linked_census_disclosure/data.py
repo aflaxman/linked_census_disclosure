@@ -77,7 +77,7 @@ def load_sf1_tables(state_abbr, state):
 
             # move specific columns into the table_dict for this table_id
             table_dict[table_id] = df_seg.iloc[:, col_start:(col_start+total_records)]
-            # set the column names to match the DHC Table Shell https://www2.census.gov/programs-surveys/decennial/2020/program-management/data-product-planning/2010-demonstration-data-products/02-Demographic_and_Housing_Characteristics/2022-03-16_Summary_File/2022-03-16_Technical%20Document/2010_Demonstration_Data_Product-DHC_Table_Shells_person_file.xlsx
+            # set the column names to match the DHC Table Matrix https://www2.census.gov/programs-surveys/decennial/2020/program-management/data-product-planning/2010-demonstration-data-products/02-Demographic_and_Housing_Characteristics/2022-08-25_Summary_File/2022-08-25_Technical%20Document/20220825_2010%20Demonstration%20Data%20Product%20-DHC_Table%20Matrix.xlsx
             table_dict[table_id].columns = [f'{table_id}{i+1:04d}' for i in range(total_records)]
 
             # merge in the geographic identifiers
@@ -118,7 +118,7 @@ def load_dhc_tables(state_abbr, state):
 
     col_names = 'FILEID,STUSAB,SUMLEV,GEOVAR,GEOCOMP,CHARITER,CIFSN,LOGRECNO,GEOID,GEOCODE,REGION,DIVISION,STATE,STATENS,COUNTY,COUNTYCC,COUNTYNS,COUSUB,COUSUBCC,COUSUBNS,SUBMCD,SUBMCDCC,SUBMCDNS,ESTATEFP,ESTATECC,ESTATENS,CONCIT,CONCITCC,CONCITNS,PLACE,PLACECC,PLACENS,TRACT,BLKGRP,BLOCK,AIANHH,AIHHTLI,AIANHHFP,AIANHHCC,AIANHHNS,AITS,AITSFP,AITSCC,AITSNS,TTRACT,BTBG,ANRC,ANRCCC,ANRCNS,CBSA,MEMI,CSA,METDIV,NECTA,NMEMI,CNECTA,NECTADIV,CBSAPCI,NECTAPCI,UA,UATYPE,UR,CD111,CD113,CD114,CD115,CD116,SLDU11,SLDU12,SLDU14,SLDU16,SLDU18,SLDL11,SLDL12,SLDL14,SLDL16,SLDL18,VTD,VTDI,ZCTA,SDELM,SDSEC,SDUNI,PUMA,AREALAND,AREAWATR,BASENAME,NAME,FUNCSTAT,GCUNI,POP100,HU100,INTPTLAT,INTPTLON,LSADC,PARTFLAG,UGA'.split(',')
 
-    file_path = '/share/scratch/users/abie/projects/2022/dhc'
+    file_path = '/share/scratch/users/abie/projects/2022/dhc_08_2022'
     df_geo = pd.read_csv(f'{file_path}/{state_abbr}geo2010.dhc',
                          sep='|',
                          header=None,
@@ -159,7 +159,7 @@ def load_dhc_tables(state_abbr, state):
 
             # move specific columns into the table_dict for this table_id
             table_dict[table_id] = df_seg.iloc[:, col_start:(col_start+total_records)]
-            # set the column names to match the DHC Table Shell https://www2.census.gov/programs-surveys/decennial/2020/program-management/data-product-planning/2010-demonstration-data-products/02-Demographic_and_Housing_Characteristics/2022-03-16_Summary_File/2022-03-16_Technical%20Document/2010_Demonstration_Data_Product-DHC_Table_Shells_person_file.xlsx
+            # set the column names to match the DHC Table Shell https://www2.census.gov/programs-surveys/decennial/2020/program-management/data-product-planning/2010-demonstration-data-products/02-Demographic_and_Housing_Characteristics/2022-03-16_Summary_File/2022-03-16_Technical%20Document/2010_Demonstration_Data_Product-DHC_Table_Shells_person_file.xlsx (on the Table_Segments tab)
             table_dict[table_id].columns = [f'{table_id}{i+1:04d}' for i in range(total_records)]
 
             # merge in the geographic identifiers
@@ -204,7 +204,7 @@ def read_synth_data(state_abbr : str) -> pd.DataFrame:
 def read_dhc_remf(state_abbr):
     assert state_abbr == 'tx'
 
-    file_path = '/share/scratch/users/abie/projects/2022/remf_april_dhc/'
+    file_path = '/share/scratch/users/abie/projects/2022/remf_august_dhc/'
 
     dhc = []
     for fname in glob.glob(f'{file_path}/dhc*.csv.gz'):
@@ -220,7 +220,7 @@ def read_dhc_remf(state_abbr):
 def read_sf1_remf(state_abbr):
     assert state_abbr == 'tx'
 
-    file_path = '/share/scratch/users/abie/projects/2022/remf_april_dhc/'
+    file_path = '/share/scratch/users/abie/projects/2022/remf_august_dhc/'
 
     sf1 = []
     for fname in glob.glob(f'{file_path}/sf1*.csv.gz'):

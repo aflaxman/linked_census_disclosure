@@ -1,5 +1,5 @@
 # Simulation study of disclosure risk in demonstration DHC data from
-  April 2022
+Updated August 2022
 
 Plan of Work:
 
@@ -11,7 +11,7 @@ For each block, reconstruct age/sex/race structure for people under age 18:
 
 Simulate linking ReMF with a corresponding block in 2020 under 4 scenarios:
 
-1. No privacy --- link on PIC (unique person identification codes)
+1. No privacy --- link on PIK (unique person identification key)
 2. No DAS --- link on age, race, block
 3. Swapping only --- link on age, race, block
 4. Swapping in 2010, TDA in 2020 --- link on age, race, block

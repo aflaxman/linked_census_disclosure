@@ -68,19 +68,17 @@ def reconstruct_block(table_dict, state, county, tract, block):
              race=range(63), ethnicity=[1]), # ethnicity 1 == hispanic
         dict(table='P12I', # SEX BY AGE FOR SELECTED AGE CATEGORIES (WHITE ALONE, NOT HISPANIC OR LATINO) [49]
              race=[0], ethnicity=[0]), # race,ethnicity == 0,0 white, non-hispanic
-        # P12J white alone or in combination, non-hispanic
-        # in DHC, but not in SF1
-        dict(table='P12K', # SEX BY AGE FOR SELECTED AGE CATEGORIES (BLACK OR AFRICAN AMERICAN ALONE, NOT HISPANIC OR LATINO) [49]
+        dict(table='P12J', # SEX BY AGE FOR SELECTED AGE CATEGORIES (BLACK OR AFRICAN AMERICAN ALONE, NOT HISPANIC OR LATINO) [49]
              race=[1], ethnicity=[0]), # race,ethnicity == 1,0 == black, non-hispanic
-        dict(table='P12M', # SEX BY AGE FOR SELECTED AGE CATEGORIES (AMERICAN INDIAN AND ALASKA NATIVE ALONE, NOT HISPANIC OR LATINO) [49]
+        dict(table='P12K', # SEX BY AGE FOR SELECTED AGE CATEGORIES (AMERICAN INDIAN AND ALASKA NATIVE ALONE, NOT HISPANIC OR LATINO) [49]
              race=[2], ethnicity=[0]),
-        dict(table='P12O',
+        dict(table='P12L',
              race=[3], ethnicity=[0]),
-        dict(table='P12Q',
+        dict(table='P12M',
              race=[4], ethnicity=[0]),
-        dict(table='P12S',
+        dict(table='P12N',
              race=[5], ethnicity=[0]),
-        dict(table='P12U', # SEX BY AGE FOR SELECTED AGE CATEGORIES (TWO OR MORE RACES, NOT HISPANIC OR LATINO) [49]
+        dict(table='P12O', # SEX BY AGE FOR SELECTED AGE CATEGORIES (TWO OR MORE RACES, NOT HISPANIC OR LATINO) [49]
              race=range(6,63), ethnicity=[0]), # race 6+ = two or more
     ]
 

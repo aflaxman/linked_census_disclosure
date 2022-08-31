@@ -2,13 +2,13 @@
 #SBATCH -t 24:00:00
 #SBATCH --mem=64G
 #SBATCH -c 1
-#SBATCH -A proj_simscience
+#SBATCH -A proj_csu
 #SBATCH -p all.q
-#SBATCH -o /share/scratch/users/abie/projects/2022/remf_april_dhc/output.txt
+#SBATCH -o /share/scratch/users/abie/projects/2022/remf_august_dhc/output.txt
 
 import sys
 
-file_path = '/share/scratch/users/abie/projects/2022/remf_april_dhc'
+file_path = '/share/scratch/users/abie/projects/2022/remf_august_dhc'
 
 n_splits = int(sys.argv[1])
 i_split = int(sys.argv[2])
