@@ -191,6 +191,7 @@ def read_synth_data(state_abbr : str) -> pd.DataFrame:
 
     Note: not all state work currently
     """
+    # next line only works within IHME, email Abie to get access outside (it is in his decennial_census_synthetic_data Dropbox file)
     df_synth = pd.read_csv(f'/share/scratch/users/abie/projects/2021/das_files/{state_abbr}_synth.csv')
 
     # some parts of the simulation will be easier if each household id was unique
