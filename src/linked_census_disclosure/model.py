@@ -25,9 +25,9 @@ def reconstruct_block(table_dict, state, county, tract, block):
     geo_query_str = f'STATE == {state} and COUNTY == {county} and TRACT == {tract} and BLOCK == {block}'
 
     ### extract series from table_dict that will be part of the optimization
-
     # P8 is race in 63 categories
-    t = table_dict['P8'].query(geo_query_str).sort_values('P80001')
+    # see https://www.census.gov/data/tables/2010/dec/2010-summary-file-1.html
+    t = table_dict['P8'].query(geo_query_str)
     assert len(t) == 1
     s_p8 = t.iloc[0]
 
@@ -35,11 +35,6 @@ def reconstruct_block(table_dict, state, county, tract, block):
     t = table_dict['P9'].query(geo_query_str)
     assert len(t) == 1
     s_p9 = t.iloc[0]
-
-    # P10 is race in 63 categories for 18+
-    t = table_dict['P10'].query(geo_query_str)
-    assert len(t) == 1
-    s_p10 = t.iloc[0]
 
     # P11 is race in 63 categories*non-hispanic for 18+
     t = table_dict['P11'].query(geo_query_str)
@@ -116,16 +111,9 @@ def reconstruct_block(table_dict, state, county, tract, block):
     P8_rows += [ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, # bi-racial
              ]
     P8_rows += list(range(27, 47))  # three races    
-    #P8_rows += [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 21, 62]  # four races
-    #P8_rows += [64, 65, 66, 67, 68, 69]  # five races
-    #P8_rows += [71] # six races
-    #assert len(P8_rows) == 63
 
     model.p8_race  = ConstraintList()
     for race_code, data_ref in enumerate(P8_rows):
-        #if race_code in [53, 54, ]:
-            #print(race_code, s_p8[f'P8{data_ref:04d}'])
-            #continue
         model.p8_race.add(
             sum(model.x[a,s,race_code,e,] for a in range(n_ages) for s in range(n_sexes) for e in range(n_eths)
             ) == s_p8[f'P8{data_ref:04d}']
@@ -140,15 +128,6 @@ def reconstruct_block(table_dict, state, county, tract, block):
                 sum(model.x[a,s,race_code,0] for a in range(n_ages) for s in range(n_sexes)
                     ) == s_p9[f'P9{data_ref:04d}']
             )
-
-
-    # again for P10, now all for the 18+ age count
-    #model.p10 = ConstraintList()
-    #for race_code, data_ref in enumerate(P8_rows):
-    #    model.p10.add(
-    #            sum(model.x[18,s,race_code,e] for s in range(n_sexes) for e in range(n_eths)
-    #                ) == s_p10[f'P10{data_ref:04d}']
-    #        )
 
 
     # again for P11, now all for the 18+ age count
