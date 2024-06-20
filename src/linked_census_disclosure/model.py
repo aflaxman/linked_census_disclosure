@@ -223,6 +223,10 @@ def aggregate_and_reconstruct_block(df, state, county, tract, block):
     df_t = df_c[df_c.tract == tract]
     df_b = df_t[df_t.block == block]
 
+    if len(df_b) == 0:
+        t = df_b.copy()  # HACK: get a bunch of relevant columns (and some extra)
+        t['n'] = 0  # HACK: make sure the 'n' column is also present
+        return t
 
     table_dict = make_sf1_tables(df_b)
     for key in table_dict.keys():
