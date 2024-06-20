@@ -205,3 +205,42 @@ def reconstruct_block(table_dict, state, county, tract, block):
     df_results = pd.DataFrame(results)
 
     return df_results
+
+
+def aggregate_and_reconstruct_block(df, state, county, tract, block):
+    """To test the additional protection that reconstruction error offers
+    for data published in tables:
+      1. Aggregate data for a census block into SF1 tables
+      2. Reconstruct block from the aggregated tables
+      3. Map the data from the reconstructed format to something more
+         directly comparable with the original data
+    """
+
+    from .data import make_sf1_tables, add_geo_columns, add_race_cols
+
+    df_s = df[df.state == state]
+    df_c = df_s[df.county == county]
+    df_t = df_c[df_c.tract == tract]
+    df_b = df_t[df_t.block == block]
+
+
+    table_dict = make_sf1_tables(df_b)
+    for key in table_dict.keys():
+        add_geo_columns(table_dict[key], state, county, tract, block)
+
+    df_reconstructed_b = reconstruct_block(table_dict, state, county, tract, block)
+
+    df_reconstructed_b['sex_id'] = df_reconstructed_b['sex'] + 1
+    add_race_cols(df_reconstructed_b)
+
+    df_reconstructed_b['hispanic'] = df_reconstructed_b['eth']
+    return df_reconstructed_b
+
+    df_uniquely_reconstructed_b = df_reconstructed_b[df_reconstructed_b.n == 1]
+
+    t = pd.merge(df_b, df_uniquely_reconstructed_b,
+                 on=['age', 'sex_id', 'racwht', 'racblk', 'racaian', 'racasn', 'racnhpi', 'racsor', 'hispanic'], how='left'
+    ).filter(['age', 'sex_id', 'hisp', 'racwht', 'racblk', 'racaian', 'racasn', 'racnhpi', 'racsor', 'hispanic', 'n',])
+
+
+    df.loc[df_b.index, 'uniquely_reconstructed'] = (t.n == 1).values

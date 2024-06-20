@@ -232,3 +232,224 @@ def read_sf1_remf(state_abbr):
     column_names = ['state', 'county', 'tract', 'block', 'row_num', 'age', 'sex', 'race', 'eth', 'n']
     sf1.columns = column_names
     return sf1
+
+# mapping dictionary to collapse ages into age-groups published in
+# P12 series of SF1 tables
+p12_age_group_map = {
+    0:0,
+    1:0,
+    2:0,
+    3:0,
+    4:0,
+    5:1,
+    6:1,
+    7:1,
+    8:1,
+    9:1,
+    10:2,
+    11:2,
+    12:2,
+    13:2,
+    14:2,
+    15:3,
+    16:3,
+    17:3,
+    18:4,
+    19:4,
+}
+
+
+# functions to simulate introduction of aggregation error by
+# tabulating key SF1 tables and then reconstructing from them (for
+# each census block)
+
+def add_geo_columns(df, state, county, tract, block):
+    df['STATE'] = state
+    df['COUNTY'] = county
+    df['TRACT'] = tract
+    df['BLOCK'] = block
+
+
+def add_race_cols(df):
+    white_alone_or_in_combination = [0, 6, 7, 8, 9, 10, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    black_alone_or_in_combination = [1, 6, 11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 35, 36]
+    aian_alone_or_in_combination = [2, 7, 11, 15, 16, 17, 21, 25, 26, 27, 31, 32, 33, 37, 38, 39]
+    asn_alone_or_in_combination = [3, 8, 12, 15, 18, 19, 22, 25, 28, 29, 31, 34, 35, 37, 40]
+    nhpi_alone_or_in_combination = [4, 9, 13, 16, 18, 20, 23, 26, 28, 30, 32, 34, 36, 38, 40]
+    sor_alone_or_in_combination = [5, 10, 14, 17, 19, 20, 24, 27, 29, 30, 33, 35, 36, 39, 40]
+    
+    df['racwht'] = df.race.isin(white_alone_or_in_combination).astype(int)
+    df['racblk'] = df.race.isin(black_alone_or_in_combination).astype(int)
+    df['racaian'] = df.race.isin(aian_alone_or_in_combination).astype(int)
+    df['racasn'] = df.race.isin(asn_alone_or_in_combination).astype(int)
+    df['racnhpi'] = df.race.isin(nhpi_alone_or_in_combination).astype(int)
+    df['racsor'] = df.race.isin(sor_alone_or_in_combination).astype(int)
+
+    return df
+
+
+def make_sf1_tables(df):
+    t = {}
+    t['P8'] = pd.DataFrame({
+	'P80001': [len(df)], # total population
+	'P80003': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0'))],  # White alone
+	'P80004': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0'))],  # Black or African American alone
+	'P80005': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P80006': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80007': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80008': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80011': [np.sum(df.eval('racwht == 1 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P80012': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P80013': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80014': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80015': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80016': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P80017': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80018': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80019': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80020': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80021': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80022': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80023': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P80024': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P80025': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P80027': [np.sum(df.eval('racwht == 1 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P80028': [np.sum(df.eval('racwht == 1 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80029': [np.sum(df.eval('racwht == 1 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80030': [np.sum(df.eval('racwht == 1 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80031': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80032': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80033': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80034': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P80035': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P80036': [np.sum(df.eval('racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P80037': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P80038': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P80039': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P80040': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P80041': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P80042': [np.sum(df.eval('racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P80043': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P80044': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P80045': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P80046': [np.sum(df.eval('racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 1'))],
+    })
+    t['P9'] = pd.DataFrame({
+	'P90005': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0'))],  # White alone
+	'P90006': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0'))],  # Black or African American alone
+	'P90007': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P90008': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90009': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90010': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90013': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P90014': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P90015': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90016': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90017': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90018': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P90019': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90020': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90021': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90022': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90023': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90024': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90025': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P90026': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P90027': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P90029': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0'))],
+	'P90030': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90031': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90032': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90033': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90034': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90035': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90036': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P90037': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P90038': [np.sum(df.eval('hispanic == 0 and racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P90039': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 0'))],
+	'P90040': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 0'))],
+	'P90041': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 1'))],
+	'P90042': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P90043': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P90044': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P90045': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 1 and racsor == 0'))],
+	'P90046': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 1 and racnhpi == 0 and racsor == 1'))],
+	'P90047': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 1 and racsor == 1'))],
+	'P90048': [np.sum(df.eval('hispanic == 0 and racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 1 and racsor == 1'))],
+    })
+    t['P11'] = pd.DataFrame({
+	f'P11{i:04d}': [0] for i in range(50) # no one over 18 in this data
+    })
+
+    # add P12 tables
+    def add_p12_series(name, race_query):
+        race_query += ' and '  # HACK: make this query appendable
+        t[name] = pd.DataFrame({
+	    f'{name}0003': [np.sum(df.eval(race_query + 'age >= 0 and age <= 4 and sex_id == 1'))],
+	    f'{name}0004': [np.sum(df.eval(race_query + 'age >= 5 and age <= 9 and sex_id == 1'))],
+	    f'{name}0005': [np.sum(df.eval(race_query + 'age >= 10 and age <= 14 and sex_id == 1'))],
+	    f'{name}0006': [np.sum(df.eval(race_query + 'age >= 15 and age <= 17 and sex_id == 1'))],
+	    f'{name}0027': [np.sum(df.eval(race_query + 'age >= 0 and age <= 4 and sex_id == 2'))],
+	    f'{name}0028': [np.sum(df.eval(race_query + 'age >= 5 and age <= 9 and sex_id == 2'))],
+	    f'{name}0029': [np.sum(df.eval(race_query + 'age >= 10 and age <= 14 and sex_id == 2'))],
+	    f'{name}0030': [np.sum(df.eval(race_query + 'age >= 15 and age <= 17 and sex_id == 2'))],
+        })
+
+    # P12A: SEX BY AGE FOR SELECTED AGE CATEGORIES (WHITE ALONE) [49]
+    add_p12_series('P12A', race_query='racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0')
+    add_p12_series('P12B', race_query='racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0')
+    add_p12_series('P12C', race_query='racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0')
+    add_p12_series('P12D', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0')
+    add_p12_series('P12E', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0')
+    add_p12_series('P12F', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1')
+    # P12U: SEX BY AGE FOR SELECTED AGE CATEGORIES (SOME OTHER RACE ALONE, HISPANIC OR LATINO) [49]
+    add_p12_series('P12U', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1 and hispanic == 1')
+    add_p12_series('P12H', race_query='hispanic == 1')
+    add_p12_series('P12I', race_query='racwht == 1 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0 and hispanic == 0')
+    add_p12_series('P12J', race_query='racwht == 0 and racblk == 1 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 0 and hispanic == 0')
+    add_p12_series('P12K', race_query='racwht == 0 and racblk == 0 and racaian == 1 and racasn == 0 and racnhpi == 0 and racsor == 0 and hispanic == 0')
+    add_p12_series('P12L', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 1 and racnhpi == 0 and racsor == 0 and hispanic == 0')
+    add_p12_series('P12M', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 1 and racsor == 0 and hispanic == 0')
+    add_p12_series('P12N', race_query='racwht == 0 and racblk == 0 and racaian == 0 and racasn == 0 and racnhpi == 0 and racsor == 1 and hispanic == 0')
+
+
+    t['P14'] = pd.DataFrame({
+	'P140003': [np.sum(df.eval('sex_id == 1 and age == 0'))],
+	'P140004': [np.sum(df.eval('sex_id == 1 and age == 1'))],
+	'P140005': [np.sum(df.eval('sex_id == 1 and age == 2'))],
+	'P140006': [np.sum(df.eval('sex_id == 1 and age == 3'))],
+	'P140007': [np.sum(df.eval('sex_id == 1 and age == 4'))],
+	'P140008': [np.sum(df.eval('sex_id == 1 and age == 5'))],
+	'P140009': [np.sum(df.eval('sex_id == 1 and age == 6'))],
+	'P140010': [np.sum(df.eval('sex_id == 1 and age == 7'))],
+	'P140011': [np.sum(df.eval('sex_id == 1 and age == 8'))],
+	'P140012': [np.sum(df.eval('sex_id == 1 and age == 9'))],
+	'P140013': [np.sum(df.eval('sex_id == 1 and age == 10'))],
+	'P140014': [np.sum(df.eval('sex_id == 1 and age == 11'))],
+	'P140015': [np.sum(df.eval('sex_id == 1 and age == 12'))],
+	'P140016': [np.sum(df.eval('sex_id == 1 and age == 13'))],
+	'P140017': [np.sum(df.eval('sex_id == 1 and age == 14'))],
+	'P140018': [np.sum(df.eval('sex_id == 1 and age == 15'))],
+	'P140019': [np.sum(df.eval('sex_id == 1 and age == 16'))],
+	'P140020': [np.sum(df.eval('sex_id == 1 and age == 17'))],
+	'P140024': [np.sum(df.eval('sex_id == 2 and age == 0'))],
+	'P140025': [np.sum(df.eval('sex_id == 2 and age == 1'))],
+	'P140026': [np.sum(df.eval('sex_id == 2 and age == 2'))],
+	'P140027': [np.sum(df.eval('sex_id == 2 and age == 3'))],
+	'P140028': [np.sum(df.eval('sex_id == 2 and age == 4'))],
+	'P140029': [np.sum(df.eval('sex_id == 2 and age == 5'))],
+	'P140030': [np.sum(df.eval('sex_id == 2 and age == 6'))],
+	'P140031': [np.sum(df.eval('sex_id == 2 and age == 7'))],
+	'P140032': [np.sum(df.eval('sex_id == 2 and age == 8'))],
+	'P140033': [np.sum(df.eval('sex_id == 2 and age == 9'))],
+	'P140034': [np.sum(df.eval('sex_id == 2 and age == 10'))],
+	'P140035': [np.sum(df.eval('sex_id == 2 and age == 11'))],
+	'P140036': [np.sum(df.eval('sex_id == 2 and age == 12'))],
+	'P140037': [np.sum(df.eval('sex_id == 2 and age == 13'))],
+	'P140038': [np.sum(df.eval('sex_id == 2 and age == 14'))],
+	'P140039': [np.sum(df.eval('sex_id == 2 and age == 15'))],
+	'P140040': [np.sum(df.eval('sex_id == 2 and age == 16'))],
+	'P140041': [np.sum(df.eval('sex_id == 2 and age == 17'))],
+    })
+    
+    return t
