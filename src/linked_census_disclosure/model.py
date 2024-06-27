@@ -218,14 +218,18 @@ def aggregate_and_reconstruct_block(df, state, county, tract, block):
 
     from .data import make_sf1_tables, add_geo_columns, add_race_cols
 
-    df_s = df[df.state == state]
-    df_c = df_s[df.county == county]
-    df_t = df_c[df_c.tract == tract]
-    df_b = df_t[df_t.block == block]
+    # HACK: subset to the rows for the block outside of this function
+    # which makes it easier to test for block in 2010 and 2020
+    df_b = df.copy()
+    df_b.state = state
+    df_b.county = county
+    df_b.tract = tract
+    df_b.block = block
 
     if len(df_b) == 0:
         t = df_b.copy()  # HACK: get a bunch of relevant columns (and some extra)
         t['n'] = 0  # HACK: make sure the 'n' column is also present
+        t['sex'] = 0
         return t
 
     table_dict = make_sf1_tables(df_b)
